@@ -69,6 +69,16 @@ def randint(maxval):
 
 
 def read_batch(file_obj, batch_num):
+    """
+    p = [k for k in file_obj.read().split('\n')]
+    r = [m.split('\t') for m in p if m != '']
+    c = 0
+    for ele in r:
+        c += 1
+        print(len(ele))
+        if c == 10: quit()
+    #quit()
+    """
     seqs = []
     for i in range(0, batch_num):
         line = file_obj.readline()
