@@ -1,5 +1,6 @@
 import os
 import json
+import tensorflow as tf
 
 
 def categorize_by_groups(path, output_path):
@@ -41,3 +42,51 @@ def occurring_features(data):
                     if feature_type not in features:
                         features.append(feature_type)
     return features
+
+
+def topology_gen(path, outpath):
+    topology_dict = {}
+    i = 1
+    for f in os.listdir(path):
+        print(f"{f}: {i} of {len(os.listdir(path))}")
+        i += 1
+        file = open(os.path.join(path, f))
+        data = json.load(file)
+        regions = data["metadata"]["regions"]
+        features = len(data["metadata"]["features"])
+        topology = []
+        neurons = regions*features
+        while neurons > 1:
+            topology.append(int(neurons))
+            neurons /= 2
+        topology_dict[f] = topology
+    out_file = open(os.path.join(outpath, "topology.json"), "w+")
+    out_file.write(json.dumps(topology_dict))
+
+
+def randint(maxval):
+    return int(tf.random.uniform(shape=[1], minval=0, maxval=maxval, dtype=tf.dtypes.int32).numpy())
+
+
+def read_batch(file_obj, batch_num):
+    """
+    p = [k for k in file_obj.read().split('\n')]
+    r = [m.split('\t') for m in p if m != '']
+    c = 0
+    for ele in r:
+        c += 1
+        print(len(ele))
+        if c == 10: quit()
+    #quit()
+    """
+    seqs = []
+    for i in range(0, batch_num):
+        line = file_obj.readline()
+        if not line:
+            return seqs
+        else:
+            seqs.append([int(j) for j in line.split('\t') if j != ''])
+    return seqs
+
+
+
