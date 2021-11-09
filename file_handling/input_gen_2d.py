@@ -67,8 +67,8 @@ def regions_binary_2d(data, ss3):
     return output_data
 
 
-def main(inpath, ss3):
+def main(inpath, ss3):    # inpath: path to .struc file; ss3: boolean if true that use ss3 structure, else ss8
     sec_features = read_input(inpath)
     sec_fas_format = to_fas_format(sec_features)
     output_data = regions_binary_2d(sec_fas_format, ss3)
-
+    return output_data
