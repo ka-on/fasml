@@ -1,8 +1,4 @@
-from networks.citrat_cycle.storage import CitrateStatic
-from model_types.dense import DenseLayersModel
-import os
-import json
-from ast import literal_eval
+from fasml.networks.citrat_cycle import CitrateStatic
 
 
 class CitrateCycle:

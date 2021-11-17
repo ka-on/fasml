@@ -18,16 +18,13 @@ topology = json.load(open(topologypath, 'r'))
 for g in topology:
     g = GROUP
     model = DenseLayersModel(topology[g], g.split('.')[0])
-
     px = open(os.path.join(datasetpath, g.split('.')[0]+'_px.tsv'))
     px_length = sum(1 for line in px)
     training_length = int(px_length*0.9)
     eval_length = px_length - training_length
     px.close()
-
     px = open(os.path.join(datasetpath, g.split('.')[0]+'_px.tsv'), 'r')
     nx = open(os.path.join(datasetpath, g.split('.')[0]+'_nx.tsv'), 'r')
-
     print("test")
     model.train(px, nx, weightspath, path, training_length, eval_length)
     break

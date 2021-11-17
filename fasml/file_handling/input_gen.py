@@ -1,12 +1,7 @@
-from file_handling.utils import shortest, occurring_features, randint
+from fasml.file_handling.utils import shortest, occurring_features, randint
 import json
 import os
 import pandas as pd
-import numpy as np
-import tensorflow as tf
-import tensorflow_datasets as tfds
-import matplotlib.pyplot as plt
-
 
 
 def matrix_gen(proteome, pids, fids, regions):
@@ -85,7 +80,8 @@ def regions_binary(data):
         regions_dict[row] = matrix[row].tolist()
     metadata = {
         "regions": regions,
-        "features": features
+        "features": features,
+        "#proteins": len(pids)
     }
     output_data = {
         "data": regions_dict,

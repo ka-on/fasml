@@ -1,8 +1,7 @@
 import os
 import tensorflow as tf
 import numpy as np
-from file_handling.utils import read_batch
-import json
+from fasml.file_handling.utils import read_batch
 
 
 class DenseLayersModel:
@@ -39,7 +38,7 @@ class DenseLayersModel:
             show_layer_names=False, rankdir='LR'
         )
 
-    def train(self, px, nx, save_weights_path, regions_binary_path, px_length, eval_length):
+    def train(self, px, nx, save_weights_path, regions_binary_path, px_length, eval_length, epochv):
         print(self.name)
         group_weights_save_path = os.path.join(save_weights_path, self.name)
         if not os.path.isdir(group_weights_save_path):
@@ -78,7 +77,7 @@ class DenseLayersModel:
             history = self.model.fit(
                 np.asarray(batch_x), np.asarray(batch_y),
                 callbacks=cp_callback,
-                epochs=100)
+                epochs=epochv)
             run += 1
             log_dict["runs"][run]["epochs"] = history.params["epochs"]
             log_dict["runs"][run]["steps"] = history.params["steps"]
@@ -104,3 +103,4 @@ class DenseLayersModel:
 
     def predict(self):
         pass  # TO DO
+
