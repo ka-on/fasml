@@ -4,7 +4,6 @@ import argparse
 from fasml.model_types import dense
 
 
-
 def main(group, inpath, outpath, epochv):
     with open(os.path.join(inpath, group+'.json'), 'r') as infile:
         metadata = json.load(infile)['metadata']

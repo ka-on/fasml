@@ -115,20 +115,29 @@ def dataset_gen_2d(path, annopath, group_name, out_dir):
     #Negative data
     negative = len(px)*4
     outfile_nx_path = os.path.join(out_dir, f"{group_name}_nx.tsv")
-    outfile_ny_path = os.path.join(out_dir, f"{group_name}_ny.tsv")
     outfile_nx = open(outfile_nx_path, "a")
-    for i in range(0, negative):
-        if i % 20 == 0:
-            print(f"Negative data {i} of {negative}")
-        random_file = os.listdir(annopath)[randint(len(os.listdir(annopath)))]
-        negative_data = to_fas_format(read_input(os.path.join(annopath, random_file)))
-        random_protein = [protein for protein in
-                          negative_data["feature"]][randint(len([protein for protein in negative_data["feature"]]))]
-        pa = input_gen.matrix_gen_single(
-            negative_data["feature"][random_protein],
-            group_data["metadata"]["features"],
-            group_data["metadata"]["regions"])
-        outfile_nx.write('\t'.join([str(i) for i in pa]) + '\n')
+    files = os.listdir(annopath)
+    if group_name + '.structure' in files:
+        files.remove(group_name + '.structure')
+    division = int(negative / len(files))
+    rest = negative % len(files)
+    per_file = {}
+    for i in files:
+        per_file[i] = division
+    for i in range(rest):
+        random_file = files[randint(len(files))]
+        per_file[random_file] += 1
+        files.remove(random_file)
+    for n_file in per_file:
+        negative_data = to_fas_format(read_input(os.path.join(annopath, n_file)))
+        for i in range(per_file[n_file]):
+            random_protein = [protein for protein in
+                              negative_data["feature"]][randint(len([protein for protein in negative_data["feature"]]))]
+            pa = input_gen.matrix_gen_single(
+                negative_data["feature"][random_protein],
+                group_data["metadata"]["features"],
+                group_data["metadata"]["regions"])
+            outfile_nx.write('\t'.join([str(i) for i in pa]) + '\n')
     outfile_nx.close()
 
 
