@@ -5,16 +5,18 @@ from fasml.model_types import dense
 
 
 def main(group, inpath, outpath, epochv):
-    with open(os.path.join(inpath, group+'.json'), 'r') as infile:
+    with open(os.path.join(inpath, group + '.json'), 'r') as infile:
         metadata = json.load(infile)['metadata']
     topology = calc_topology(metadata['regions'], len(metadata['features']))
-    print(topology)
     model = dense.DenseLayersModel(topology, group)
     training_length = int(metadata['#proteins'] * 0.9)
     eval_length = metadata['#proteins'] - training_length
     px = open(os.path.join(inpath, group + '_px.tsv'), 'r')
     nx = open(os.path.join(inpath, group + '_nx.tsv'), 'r')
     model.train(px, nx, outpath, '', training_length, eval_length, epochv)
+    model_data = {'topology': topology, 'name': group}
+    with open(os.path.join(outpath + group + '/topology.json'), 'w') as out:
+        json.dump(model_data, out)
 
 
 def calc_topology(regions, features):
