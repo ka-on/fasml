@@ -79,8 +79,8 @@ class DenseLayersModel:
                 callbacks=cp_callback,
                 epochs=epochv)
             run += 1
-            log_dict["runs"][run]["epochs"] = history.params["epochs"]
-            log_dict["runs"][run]["steps"] = history.params["steps"]
+            #log_dict["runs"][run]["epochs"] = history.params["epochs"]
+            #log_dict["runs"][run]["steps"] = history.params["steps"]
 
         eval_samples_fed = 0
         while eval_samples_fed != eval_length:

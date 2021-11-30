@@ -90,9 +90,8 @@ def main(inpath, ss3, outpath, group):    # inpath: path to .struc file; ss3: bo
     sec_features = read_input(inpath+group+'.structure')
     sec_fas_format = to_fas_format(sec_features)
     output_data = regions_binary_2d(sec_fas_format, ss3)
-    jout = json.dumps(output_data)
-    output_file = open(outpath + group + ".json", "w+")
-    output_file.write(jout)
+    with open(outpath + group + ".json", "w+") as output_file:
+        json.dump(output_data, output_file)
     dataset_gen_2d(outpath, inpath, group, outpath)
 
 
