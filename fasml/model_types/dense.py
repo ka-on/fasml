@@ -38,7 +38,7 @@ class DenseLayersModel:
             show_layer_names=False, rankdir='LR'
         )
 
-    def train(self, px, nx, save_weights_path, regions_binary_path, px_length, eval_length, epochv):
+    def train(self, px, nx, save_weights_path, px_length, eval_length, epochv):
         print(self.name)
         group_weights_save_path = os.path.join(save_weights_path, self.name)
         if not os.path.isdir(group_weights_save_path):
@@ -50,10 +50,9 @@ class DenseLayersModel:
             verbose=1
         )
         samples_fed = 0
-        run = 1
         batch_x = []
         batch_y = []
-        print("Reading training data...", end = "\r")
+        print("Reading training data...", end="\r")
         while samples_fed != px_length:
             batch_size = min(10, px_length-samples_fed)
             batch_px = read_batch(px, batch_size)
@@ -76,7 +75,6 @@ class DenseLayersModel:
         while eval_samples_fed != eval_length:
             batch_size = min(500, eval_length-eval_samples_fed)
             eval_samples_fed += batch_size
-            print(eval_samples_fed)
             batch_px = read_batch(px, batch_size)
             batch_nx = read_batch(nx, batch_size*4)
             batch_x = batch_x + batch_px + batch_nx
@@ -105,7 +103,15 @@ class DenseLayersModel:
                 log_file.write(f"evaluation: {str(scores[0]):.6} {str(scores[1]):.6}")
         return history
 
+    def predict(self, query, cpus):
+        querydata = []
+        for line in query.readlines():
+            if line:
+                querydata.append([int(j) for j in line.split('\t') if j != ''])
+        results = self.model.predict(
+            querydata, batch_size=50, verbose=0, steps=None, callbacks=None, max_queue_size=10,
+            workers=cpus, use_multiprocessing=True
+        )
+        return results
 
-    def predict(self):
-        pass  # TO DO
 

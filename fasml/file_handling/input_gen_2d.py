@@ -140,6 +140,33 @@ def dataset_gen_2d(path, annopath, group_name, out_dir):
     outfile_nx.close()
 
 
+def queryset_gen(inpath, groupjson, outdir):    # inpath: path to .struc file
+    sec_features = read_input(inpath)
+    sec_fas_format = to_fas_format(sec_features)
+    with open(groupjson, 'r') as file:
+        group_data = json.load(file)
+    with open(os.path.join(outdir, inpath.split('/')[-1].split['.'][0:-1]), 'w') as out:
+        for protein in sec_fas_format['feature']:
+            line = input_gen.matrix_gen_single(
+                sec_fas_format["feature"][protein],
+                group_data["metadata"]["features"],
+                group_data["metadata"]["regions"])
+            out.write('\t'.join([str(i) for i in line]) + '\n')
+
+
+def query_gen_entry():
+    parser = argparse.ArgumentParser(epilog="creates the queryinput for the ml")
+    required = parser.add_argument_group('required arguments')
+    required.add_argument("-i", "--inputPath", default=None, type=str, required=True,
+                          help="path to input .structure file")
+    required.add_argument("-o", "--outPath", default='.', type=str, required=True,
+                          help="path to output directory")
+    required.add_argument("-j", "--group_json", type=str, required=True,
+                          help="data of the search group (json file)")
+    args = parser.parse_args()
+    queryset_gen(args.inputPath, args.outPath, args.group_json)
+
+
 def get_args():
     parser = argparse.ArgumentParser(epilog="creates the input for the ml")
     required = parser.add_argument_group('required arguments')

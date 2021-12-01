@@ -13,7 +13,7 @@ def main(group, inpath, outpath, epochv):
     eval_length = metadata['#proteins'] - training_length
     px = open(os.path.join(inpath, group + '_px.tsv'), 'r')
     nx = open(os.path.join(inpath, group + '_nx.tsv'), 'r')
-    model.train(px, nx, outpath, '', training_length, eval_length, epochv)
+    model.train(px, nx, outpath, training_length, eval_length, epochv)
     model_data = {'topology': topology, 'name': group}
     with open(os.path.join(outpath + group + '/topology.json'), 'w') as out:
         json.dump(model_data, out)
