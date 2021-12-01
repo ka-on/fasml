@@ -103,14 +103,14 @@ class DenseLayersModel:
                 log_file.write(f"evaluation: {str(scores[0]):.6} {str(scores[1]):.6}")
         return history
 
-    def predict(self, query, cpus):
+    def predict(self, query):
         querydata = []
         for line in query.readlines():
             if line:
                 querydata.append([int(j) for j in line.split('\t') if j != ''])
         results = self.model.predict(
             querydata, batch_size=50, verbose=0, steps=None, callbacks=None, max_queue_size=10,
-            workers=cpus, use_multiprocessing=True
+            workers=1, use_multiprocessing=True
         )
         return results
 
