@@ -140,18 +140,20 @@ def dataset_gen_2d(path, annopath, group_name, out_dir):
     outfile_nx.close()
 
 
-def queryset_gen(inpath, groupjson, outdir):    # inpath: path to .struc file
+def queryset_gen(inpath, outdir, groupjson):    # inpath: path to .struc file
     sec_features = read_input(inpath)
     sec_fas_format = to_fas_format(sec_features)
     with open(groupjson, 'r') as file:
         group_data = json.load(file)
-    with open(os.path.join(outdir, inpath.split('/')[-1].split['.'][0:-1]), 'w') as out:
+    with open(os.path.join(outdir, ''.join(inpath.split('/')[-1].split('.')[0:-1]) + '.csv'), 'w') as out:
+        labels = open(os.path.join(outdir, ''.join(inpath.split('/')[-1].split('.')[0:-1]) + '_labels.csv'), 'w')
         for protein in sec_fas_format['feature']:
             line = input_gen.matrix_gen_single(
                 sec_fas_format["feature"][protein],
                 group_data["metadata"]["features"],
                 group_data["metadata"]["regions"])
             out.write('\t'.join([str(i) for i in line]) + '\n')
+            labels.write(protein + '\n')
 
 
 def query_gen_entry():

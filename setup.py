@@ -44,7 +44,8 @@ setup(
     entry_points={
         'console_scripts': ["fasml.input_gen2d = fasml.file_handling.input_gen_2d:get_args",
                             "fasml.query_gen2d = fasml.file_handling.input_gen_2d:query_gen_entry",
-                            "fasml.create_dense = fasml.create_dense_NN:get_args"
+                            "fasml.create_dense = fasml.create_dense_NN:get_args",
+                            "fasml.apply_dense = fasml.apply_dense_NN:get_args"
                             ],
     },
     license="GPL-3.0",
