@@ -1,9 +1,9 @@
 #!/bin/env python
 
-#######################################################################  NEEDS TO BE CHANGED!!!!!!!
-# Copyright (C) 2019 Julian Dosch
+#######################################################################
+# Copyright (C) 2021 Onur Kaya, Julian Dosch
 #
-# This file is part of greedyFAS.
+# This file is part of fasml.
 #
 #  greedyFAS is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with greedyFAS.  If not, see <http://www.gnu.org/licenses/>.
+#  along with fasml.  If not, see <http://www.gnu.org/licenses/>.
 #
 #######################################################################
 

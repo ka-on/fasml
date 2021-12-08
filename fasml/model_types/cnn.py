@@ -1,26 +1,3 @@
-#!/bin/env python
-
-#######################################################################
-# Copyright (C) 2021 Onur Kaya, Julian Dosch
-#
-# This file is part of fasml.
-#
-#  greedyFAS is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
-#
-#  greedyFAS is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with fasml.  If not, see <http://www.gnu.org/licenses/>.
-#
-#######################################################################
-
-
 import os
 import tensorflow as tf
 import numpy as np
@@ -29,16 +6,24 @@ from fasml.file_handling.utils import read_batch
 
 class DenseLayersModel:
 
-    def __init__(self, topology, name,
+    def __init__(self, outputsize, name, features,
                  optimizer=tf.keras.optimizers.SGD(),
                  loss_function=tf.losses.MeanSquaredError()):
         model = tf.keras.Sequential()
-        l0 = tf.keras.layers.Dense(
-            units=topology[1],
-            input_shape=(topology[0],)
-        )
-        model.add(l0)
-        for units in topology[2:]:
+        convolution = tf.keras.layers.Conv2D(32, (features, 20), activation='relu', input_shape=(features, None))
+        pooling = tf.keras.layers.GlobalMaxPooling1D()
+        convolution2 = tf.keras.layers.Conv2D(64, (1, 4), activation='relu')
+        pooling2 = tf.keras.layers.GlobalMaxPooling1D()
+        convolution3 = tf.keras.layers.Conv2D(128, (1, 4), activation='relu')
+        pooling3 = tf.keras.layers.GlobalMaxPooling1D()
+        model.add(convolution)
+        model.add(pooling)
+        model.add(convolution2)
+        model.add(pooling2)
+        model.add(convolution3)
+        model.add(pooling3)
+        model.add(tf.keras.layers.Flatten())
+        for units in [128, 64, 32, 16, 8, 4, 2, 1]:
             layer = tf.keras.layers.Dense(
                 units=units,
                 activation=tf.keras.activations.relu
@@ -52,7 +37,25 @@ class DenseLayersModel:
         )
 
         self.model = model
-        self.topology = topology
+        self.topology = {
+            'input': [features, '>=20'],
+            'layers': [
+                ['conv', [features, 20, 32]],
+                ['maxPool', [32]],
+                ['conv', [1, 4, 64]],
+                ['maxPool', [64]],
+                ['conv', [1, 4, 128]],
+                ['maxPool', [128]],
+                ['dense', [128]],
+                ['dense', [64]],
+                ['dense', [32]],
+                ['dense', [16]],
+                ['dense', [8]],
+                ['dense', [4]],
+                ['dense', [2]],
+                ['dense', [1]],
+            ]
+            }
         self.name = name
 
     def plot(self):
@@ -110,12 +113,12 @@ class DenseLayersModel:
         if batch_x:
             scores = self.model.evaluate(
                 np.asarray(batch_x),
-                np.asarray(batch_y), 
-                batch_size=2500, 
+                np.asarray(batch_y),
+                batch_size=2500,
                 verbose=1)
         # Log the training
         with open(os.path.join(group_weights_save_path, "log.txt"), 'w+') as log_file:
-            log_file.write("epochs: " + str(history.params["epochs"]) 
+            log_file.write("epochs: " + str(history.params["epochs"])
                            + "\nsteps: " + str(history.params["steps"])
                            + "\ntraining size: " + str(statistics[0])
                            + "\neval size: " + str(statistics[1])
