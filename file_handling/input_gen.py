@@ -3,6 +3,10 @@ import json
 import os
 import pandas as pd
 import numpy as np
+import tensorflow as tf
+import tensorflow_datasets as tfds
+import matplotlib.pyplot as plt
+
 
 
 def matrix_gen(proteome, pids, fids, regions):
@@ -126,8 +130,8 @@ def dataset_gen(path, annopath, group_name, root_dir):
     outfile_px = open(outfile_px_path, "a")
     outfile_py = open(outfile_py_path, "a")
     for j, pa_pattern in enumerate(px):
-        outfile_px.write('\t'.join([str(i) for i in pa_pattern])+'\n')
-        outfile_py.write(str(py[j])+'\t')
+        outfile_px.write(','.join([str(i) for i in pa_pattern])+'\n')
+        outfile_py.write(str(py[j])+',')
     outfile_px.close()
     outfile_py.close()
 
@@ -149,7 +153,8 @@ def dataset_gen(path, annopath, group_name, root_dir):
             negative_data["feature"][random_protein],
             group_data["metadata"]["features"],
             group_data["metadata"]["regions"])
-        outfile_nx.write('\t'.join([str(i) for i in pa]) + '\n')
-        outfile_ny.write('0\t')
+        outfile_nx.write(','.join([str(i) for i in pa]) + '\n')
+        outfile_ny.write('0,')
     outfile_nx.close()
     outfile_ny.close()
+
