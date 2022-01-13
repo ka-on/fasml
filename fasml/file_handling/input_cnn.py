@@ -77,7 +77,7 @@ def get_args():
     optional.add_argument("-s", "--ss3", action="store_true",
                           help="use ss3 structure instead of ss8")
     args = parser.parse_args()
-    main(args.inputPath, args.outPath, args.group_json)
+    main(args.inputPath, args.outPath, args.ss3)
 
 
 if __name__ == '__main__':
