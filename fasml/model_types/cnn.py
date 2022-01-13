@@ -29,22 +29,20 @@ from fasml.file_handling.utils import read_batch
 
 class DenseLayersModel:
 
-    def __init__(self, outputsize, name, features,
+    def __init__(self, name, features,
                  optimizer=tf.keras.optimizers.SGD(),
                  loss_function=tf.losses.MeanSquaredError()):
         model = tf.keras.Sequential()
-        convolution = tf.keras.layers.Conv2D(32, (features, 20), activation='relu', input_shape=(features, None))
+        convolution = tf.keras.layers.Conv1D(64, 20, activation='relu', input_shape=(None, features))
         pooling = tf.keras.layers.GlobalMaxPooling1D()
-        convolution2 = tf.keras.layers.Conv2D(64, (1, 4), activation='relu')
-        pooling2 = tf.keras.layers.GlobalMaxPooling1D()
-        convolution3 = tf.keras.layers.Conv2D(128, (1, 4), activation='relu')
-        pooling3 = tf.keras.layers.GlobalMaxPooling1D()
+        convolution2 = tf.keras.layers.Conv1D(128, 4, activation='relu')
+        convolution3 = tf.keras.layers.Conv1D(256, 4, activation='relu')
         model.add(convolution)
         model.add(pooling)
         model.add(convolution2)
-        model.add(pooling2)
+        model.add(pooling)
         model.add(convolution3)
-        model.add(pooling3)
+        model.add(pooling)
         model.add(tf.keras.layers.Flatten())
         for units in [128, 64, 32, 16, 8, 4, 2, 1]:
             layer = tf.keras.layers.Dense(
@@ -53,12 +51,7 @@ class DenseLayersModel:
             )
             model.add(layer)
 
-        model.compile(
-            optimizer=optimizer,
-            loss=loss_function,
-            metrics=["accuracy"]
-        )
-
+        model.compile(optimizer=optimizer, loss=loss_function, metrics=["accuracy"])
         self.model = model
         self.topology = {
             'input': [features, '>=20'],
