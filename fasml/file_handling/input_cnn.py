@@ -74,7 +74,7 @@ def get_args():
                           help="path to input .structure file")
     required.add_argument("-o", "--outPath", default='.', type=str, required=True,
                           help="path to output directory")
-    optional.add_argument("-s", "--ss3", action="store_true",
+    optional.add_argument("-s", "--ss3", action="store_false",
                           help="use ss3 structure instead of ss8")
     args = parser.parse_args()
     main(args.inputPath, args.outPath, args.ss3)
