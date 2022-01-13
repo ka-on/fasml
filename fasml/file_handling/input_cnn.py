@@ -29,7 +29,7 @@ def to_str_array_single(sequence, mode):
     ss3, ss8, dis = sequence
     i_dict = {'C': 0, 'H': 1, 'E': 2, 'S': 3, 'T': 4, 'I': 5, 'B': 6, 'G': 7}
     str_array = []
-    for i in len(ss8):
+    for i in range(len(ss8)):
         if mode:
             tmp = [0, 0, 0, 0, 0, 0, 0, 0, 0]
             tmp[i_dict[ss8[i]]] = 1
