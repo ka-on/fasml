@@ -19,17 +19,16 @@
 #  along with fasml.  If not, see <http://www.gnu.org/licenses/>.
 #
 #######################################################################
+
 import json
-import os
 import tensorflow as tf
 import numpy as np
-from fasml.file_handling.utils import read_batch
 from math import ceil
 from random import shuffle
 import time
 
 
-class CNN_Model:
+class CNNModel:
 
     def __init__(self, name, features,
                  optimizer=tf.keras.optimizers.SGD(),
@@ -109,9 +108,9 @@ class CNN_Model:
 
             # Iterate over the batches of the dataset.
             for step in range(len(pos_batches)):
-                for minibatch in pos_batches[i]
+                for minibatch in pos_batches[step]:
                     loss_value = self.train_step(minibatch, np.ones(len(minibatch)))
-                for minibatch in neg_batches[i]
+                for minibatch in neg_batches[step]:
                     loss_value = self.train_step(minibatch, np.ones(len(minibatch)))
 
                 # Log every 200 batches.
@@ -163,8 +162,10 @@ class CNN_Model:
         pos_keys = []
         neg_keys = []
         for i in range(n_pos):
+            # noinspection PyTypeChecker
             pos_keys.extend(shuffle(list(pos_data.keys())))
         for x in range(n_neg):
+            # noinspection PyTypeChecker
             neg_keys.extend(shuffle(list(neg_data.keys())))
         if len(pos_keys) > len(neg_keys):
             b_size = ceil(len(pos_keys) / len(neg_keys))

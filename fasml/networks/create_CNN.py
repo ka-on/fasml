@@ -28,7 +28,7 @@ from fasml.model_types import cnn
 
 
 def main(pos_path, neg_path, name, features, outpath, epochv, p_exclude, n_exclude):
-    model = cnn.CNN_Model(name, features)
+    model = cnn.CNNModel(name, features)
     topology = model.get_topology()
     outpath2 = os.path.join(outpath, name)
     if not os.path.isdir(outpath2):
