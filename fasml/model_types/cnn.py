@@ -112,7 +112,7 @@ class CNNModel:
                     loss_value.append(self.model.train_on_batch(np.array(minibatch), np.zeros(len(minibatch)))[1])
 
                 # Log every 200 batches.
-                if step % 200 == 0:
+                if step % 10 == 0:
                     print(
                         "Training loss (for one batch) at step %d: %.4f"
                         % (step, float(sum(loss_value)/len(loss_value)))
@@ -204,15 +204,32 @@ class CNNModel:
                     data_out[length + '_' + str(x)] = datadict[length][max_batch * x: max_batch * (x + 1)]
         return data_out, size
 
-    def predict(self, query):
-        query_data = []
-        for line in query.readlines():
-            if line:
-                query_data.append([int(j) for j in line.split('\t') if j != ''])
-        results = self.model.predict(
-            query_data, batch_size=50, verbose=0, steps=None, callbacks=None, max_queue_size=10,
-            workers=1, use_multiprocessing=True
-        )
+    def create_query_datadict(self, path, min_len):
+        datadict = {}
+        with open(path, 'r') as infile:
+            in_data = json.load(infile)
+        empty_col = None
+        for prot in in_data:
+            if not empty_col:
+                empty_col = []
+                for f in in_data[prot][0]:
+                    empty_col.append(0)
+            tmp = in_data[prot]
+            while len(tmp) < min_len:
+                tmp.append(empty_col)
+            if str(len(tmp)) not in datadict:
+                datadict[str(len(tmp))] = [[], []]
+            datadict[str(len(tmp))][0].append(tmp)
+            datadict[str(len(tmp))][1].append(prot)
+        return datadict
+
+    def predict(self, path):
+        query_data = self.create_query_datadict(path, 30)
+        results = {}
+        for batch in query_data:
+            part_result = self.model.predict(np.array(batch[0]), verbose=False)
+            for i in range(len(batch[0])):
+                results[batch[1][i]] = part_result[i][0]
         return results
 
     def load_weights(self, path):

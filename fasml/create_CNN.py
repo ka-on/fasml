@@ -35,6 +35,7 @@ def main(pos_path, neg_path, name, features, outpath, epochv, p_exclude, n_exclu
         os.mkdir(outpath2)
     model.train(pos_path, neg_path, p_exclude, n_exclude, epochv)
     model_data = {'topology': topology, 'name': name}
+    model.save_weights(outpath2 + '/name')
     with open(os.path.join(outpath2 + '/topology.json'), 'w') as out:
         json.dump(model_data, out)
 
