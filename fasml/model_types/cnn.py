@@ -106,8 +106,8 @@ class CNNModel:
                 for minibatch in neg_batches[step]:
                     loss_value.append(self.model.train_on_batch(np.array(minibatch), np.zeros(len(minibatch)))[1])
 
-                # Log every 200 batches.
-                if step % 10 == 0:
+                # Log every 100 batches.
+                if step % 100 == 0:
                     print(
                         "Training loss (for one batch) at step %d: %.4f"
                         % (step, float(sum(loss_value)/len(loss_value)))
