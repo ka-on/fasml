@@ -94,6 +94,7 @@ class CNNModel:
         pos_batches, neg_batches = self.prepare_batches(pos_data, pos_size, neg_data, neg_size)
 
         # train model
+        print('# Training Model')
         train_info = self.train_on_batches(pos_batches, neg_batches, epochs)
         return train_info
 
@@ -159,7 +160,7 @@ class CNNModel:
         print('Positive to Negative show ratio: ' + str(n_pos) + ' / ' + str(n_neg))
         pos_keys = []
         neg_keys = []
-        print()
+        print('# Preparing Batches')
         for i in range(n_pos):
             tmp = list(pos_data.keys())
             shuffle(tmp)
