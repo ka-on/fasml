@@ -107,16 +107,17 @@ class CNNModel:
 
             # Iterate over the batches of the dataset.
             for step in range(len(pos_batches)):
+                loss_value = []
                 for minibatch in pos_batches[step]:
-                    loss_value = self.model.train_on_batch(np.array(minibatch), np.ones(len(minibatch)))
+                    loss_value.append(self.model.train_on_batch(np.array(minibatch), np.ones(len(minibatch)))[1])
                 for minibatch in neg_batches[step]:
-                    loss_value = self.model.train_on_batch(np.array(minibatch), np.zeros(len(minibatch)))
+                    loss_value.append(self.model.train_on_batch(np.array(minibatch), np.zeros(len(minibatch)))[1])
 
                 # Log every 200 batches.
-                if step % 200 == 0:
+                if step % 1 == 0:
                     print(
                         "Training loss (for one batch) at step %d: %.4f"
-                        % (step, float(loss_value[0]))
+                        % (step, float(sum(loss_value)/len(loss_value)))
                     )
                     print("Seen so far: %d batches" % (step + 1))
 
