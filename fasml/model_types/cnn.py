@@ -163,7 +163,7 @@ class CNNModel:
 
     def prepare_batches_01(self, keys_01, keys_02, data_01, data_02):
         batches_01 = []
-        tmp = np.array_split(keys_01, keys_02)
+        tmp = np.array_split(keys_01, len(keys_02))
         c = 0
         for i in tmp:
             tmp2 = []
