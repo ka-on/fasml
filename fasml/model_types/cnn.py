@@ -177,13 +177,20 @@ class CNNModel:
         b_size = ceil(len(keys_01) / len(keys_02))
         batches_01 = []
         tmp = np.array_split(keys_01, b_size)
+        c = 0
         for i in tmp:
+            c += 1
+            if c % 50 == 0:
+                print(str(c) + ' of ' + str(len(tmp)))
             tmp2 = []
             for x in i:
                 tmp2.append(data_01[x])
             batches_01.append(tmp2)
         batches_02 = []
         for i in keys_02:
+            c += 1
+            if c % 50 == 0:
+                print(str(c) + ' of ' + str(len(tmp)))
             batches_02.append([data_02[i]])
         return batches_01, batches_02
 
