@@ -53,10 +53,10 @@ def get_args():
                           help="name of the model")
     required.add_argument("-e", "--epochs", type=int, required=True,
                           help="number of epochs")
-    optional.add_argument("--p_exclude", default=None, nargs='*', type=str,
+    optional.add_argument("--p_exclude", default=(), nargs='*', type=str,
                           help="Choose specific proteins (ids divided by spaces) that will be removed from the "
                                "positive training set")
-    optional.add_argument("--n_exclude", default=None, nargs='*', type=str,
+    optional.add_argument("--n_exclude", default=(), nargs='*', type=str,
                           help="Choose specific proteins (ids divided by spaces) that will be removed from the "
                                "negative training set")
     optional.add_argument("-f", "--features", default=9, type=int,
