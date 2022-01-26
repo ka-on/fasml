@@ -169,13 +169,26 @@ class CNNModel:
             neg_keys.extend(tmp)
         if len(pos_keys) > len(neg_keys):
             b_size = ceil(len(pos_keys) / len(neg_keys))
-            pos_batches = np.array_split(pos_keys, b_size)
+            pos_batches = []
+            tmp = np.array_split(pos_keys, b_size)
+            for i in tmp:
+                tmp2 = []
+                for x in tmp[i]:
+                    tmp2.append(x)
+                tmp.append(tmp2)
             neg_batches = []
             for i in neg_keys:
-                neg_batches.append([i])
+                neg_batches.append([neg_data[i]])
         else:
             b_size = ceil(len(neg_keys) / len(pos_keys))
-            neg_batches = np.array_split(neg_keys, b_size)
+            neg_batches = []
+            tmp = np.array_split(neg_keys, b_size)
+            for i in tmp:
+                tmp2 = []
+                for x in tmp[i]:
+                    tmp2.append(x)
+                tmp.append(tmp2)
+            neg_batches = []
             pos_batches = []
             for i in pos_keys:
                 pos_batches.append([i])
