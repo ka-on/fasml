@@ -196,7 +196,7 @@ class CNNModel:
                 data_out[length] = datadict[length]
             else:
                 for x in range(ceil(len(datadict[length])/max_batch)):
-                    data_out[length + '_' + str(x)] = datadict[length][max_batch * x: length[max_batch * (x + 1)]]
+                    data_out[length + '_' + str(x)] = datadict[length][max_batch * x: max_batch * (x + 1)]
         return data_out, size
 
     def predict(self, query):
