@@ -168,31 +168,24 @@ class CNNModel:
             shuffle(tmp)
             neg_keys.extend(tmp)
         if len(pos_keys) > len(neg_keys):
-            b_size = ceil(len(pos_keys) / len(neg_keys))
-            pos_batches = []
-            tmp = np.array_split(pos_keys, b_size)
-            for i in tmp:
-                tmp2 = []
-                for x in i:
-                    tmp2.append(x)
-                tmp.append(tmp2)
-            neg_batches = []
-            for i in neg_keys:
-                neg_batches.append([neg_data[i]])
+            pos_batches, neg_batches = self.prepare_batches_01(pos_keys, neg_keys, pos_data, neg_data)
         else:
-            b_size = ceil(len(neg_keys) / len(pos_keys))
-            neg_batches = []
-            tmp = np.array_split(neg_keys, b_size)
-            for i in tmp:
-                tmp2 = []
-                for x in i:
-                    tmp2.append(x)
-                tmp.append(tmp2)
-            neg_batches = []
-            pos_batches = []
-            for i in pos_keys:
-                pos_batches.append([i])
+            neg_batches, pos_batches = self.prepare_batches_01(neg_keys, pos_keys, neg_data, pos_data)
         return pos_batches, neg_batches
+
+    def prepare_batches_01(self, keys_01, keys_02, data_01, data_02):
+        b_size = ceil(len(keys_01) / len(keys_02))
+        batches_01 = []
+        tmp = np.array_split(keys_01, b_size)
+        for i in tmp:
+            tmp2 = []
+            for x in i:
+                tmp2.append(data_01[x])
+            batches_01.append(tmp2)
+        batches_02 = []
+        for i in keys_02:
+            batches_02.append([data_02[i]])
+        return batches_01, batches_02
 
     def create_datadict(self, path, exclude, max_batch):
         datadict = {}
