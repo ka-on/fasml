@@ -19,15 +19,17 @@
 #  along with fasml.  If not, see <http://www.gnu.org/licenses/>.
 #
 #######################################################################
-
-
+import json
 import os
 import tensorflow as tf
 import numpy as np
 from fasml.file_handling.utils import read_batch
+from math import ceil
+from random import shuffle
+import time
 
 
-class DenseLayersModel:
+class CNN_Model:
 
     def __init__(self, name, features,
                  optimizer=tf.keras.optimizers.SGD(),
@@ -73,6 +75,13 @@ class DenseLayersModel:
             ]
             }
         self.name = name
+        self.loss_fn = loss_function
+        self.optimizer = optimizer
+        self.train_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy()
+        self.val_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy()
+
+    def get_topology(self):
+        return self.topology
 
     def plot(self):
         tf.keras.utils.plot_model(
@@ -80,78 +89,123 @@ class DenseLayersModel:
             show_layer_names=False, rankdir='LR'
         )
 
-    def train(self, px, nx, save_weights_path, px_length, eval_length, epochv):
+    def train(self, positive, negative, p_exclude, n_exclude, epochs):
         print(self.name)
-        group_weights_save_path = os.path.join(save_weights_path, self.name)
-        if not os.path.isdir(group_weights_save_path):
-            os.mkdir(group_weights_save_path)
+        # prepare batches
+        pos_data, pos_size = self.create_datadict(positive, p_exclude, 20)
+        neg_data, neg_size = self.create_datadict(negative, n_exclude, 20)
+        pos_batches, neg_batches = self.prepare_batches(pos_data, pos_size, neg_data, neg_size)
 
-        cp_callback = tf.keras.callbacks.ModelCheckpoint(
-            filepath=os.path.join(group_weights_save_path, self.name),
-            save_weights_only=True,
-            verbose=1
-        )
-        samples_fed = 0
-        batch_x = []
-        batch_y = []
-        print("Reading training data...", end="\r")
-        while samples_fed != px_length:
-            batch_size = min(10, px_length-samples_fed)
-            batch_px = read_batch(px, batch_size)
-            batch_nx = read_batch(nx, batch_size*4)  # The number multiplied has to be the same as the ratio 1:4
-            batch_x = batch_x + batch_px + batch_nx
-            batch_py = [1 for i in batch_px]
-            batch_ny = [0 for i in batch_nx]
+        # train model
+        train_info = self.train_on_batches(pos_batches, neg_batches, epochs)
+        return train_info
 
-            batch_y = batch_y + batch_py + batch_ny
-            samples_fed += batch_size
-        print("Reading training data... Done!")
-        statistics = [len(batch_y)]
-        history = self.model.fit(
-            np.asarray(batch_x), np.asarray(batch_y),
-            callbacks=cp_callback,
-            epochs=epochv, batch_size=50)
-        eval_samples_fed = 0
-        batch_x = []
-        batch_y = []
-        while eval_samples_fed != eval_length:
-            batch_size = min(500, eval_length-eval_samples_fed)
-            eval_samples_fed += batch_size
-            batch_px = read_batch(px, batch_size)
-            batch_nx = read_batch(nx, batch_size*4)
-            batch_x = batch_x + batch_px + batch_nx
-            batch_py = [1 for i in batch_px]
-            batch_ny = [0 for i in batch_nx]
-            batch_y = batch_y + batch_py + batch_ny
-            print("EVAL")
-        statistics.append(len(batch_x))
-        scores = None
-        if batch_x:
-            scores = self.model.evaluate(
-                np.asarray(batch_x),
-                np.asarray(batch_y),
-                batch_size=2500,
-                verbose=1)
-        # Log the training
-        with open(os.path.join(group_weights_save_path, "log.txt"), 'w+') as log_file:
-            log_file.write("epochs: " + str(history.params["epochs"])
-                           + "\nsteps: " + str(history.params["steps"])
-                           + "\ntraining size: " + str(statistics[0])
-                           + "\neval size: " + str(statistics[1])
-                           + "\n\n# statistics per training epoch [loss & accuracy] #\n")
-            for i in range(len(history.history["loss"])):
-                log_file.write(f"epoch {str(i+1)}: {str(history.history['loss'][i]):.6} {str(history.history['accuracy'][i]):.6}\n")
-            if scores:
-                log_file.write(f"evaluation: {str(scores[0]):.6} {str(scores[1]):.6}")
-        return history
+    def train_on_batches(self, pos_batches, neg_batches, epochs):
+        train_data = {'t_acc': []}
+        for epoch in range(epochs):
+            print("\nStart of epoch %d" % (epoch,))
+            start_time = time.time()
+            loss_value = None
+
+            # Iterate over the batches of the dataset.
+            for step in range(len(pos_batches)):
+                for minibatch in pos_batches[i]
+                    loss_value = self.train_step(minibatch, np.ones(len(minibatch)))
+                for minibatch in neg_batches[i]
+                    loss_value = self.train_step(minibatch, np.ones(len(minibatch)))
+
+                # Log every 200 batches.
+                if step % 200 == 0:
+                    print(
+                        "Training loss (for one batch) at step %d: %.4f"
+                        % (step, float(loss_value))
+                    )
+                    print("Seen so far: %d batches" % (step + 1))
+
+            # Display metrics at the end of each epoch.
+            train_acc = self.train_acc_metric.result()
+            print("Training acc over epoch: %.4f" % (float(train_acc),))
+            train_data['t_acc'].append(float(train_acc))
+
+            # Reset training metrics at the end of each epoch
+            self.train_acc_metric.reset_states()
+
+            # Run a validation loop at the end of each epoch.
+#            for x_batch_val, y_batch_val in val_dataset:
+#                test_step(x_batch_val, y_batch_val)
+
+#            val_acc = self.val_acc_metric.result()
+#            self.val_acc_metric.reset_states()
+#            print("Validation acc: %.4f" % (float(val_acc),))
+            print("Time taken: %.2fs" % (time.time() - start_time))
+        return train_data
+
+    @tf.function
+    def train_step(self, x, y):
+        with tf.GradientTape() as tape:
+            logits = self.model(x, training=True)
+            loss_value = self.loss_fn(y, logits)
+        grads = tape.gradient(loss_value, self.model.trainable_weights)
+        self.optimizer.apply_gradients(zip(grads, self.model.trainable_weights))
+        self.train_acc_metric.update_state(y, logits)
+        return loss_value
+
+    def prepare_batches(self, pos_data, pos_size, neg_data, neg_size):
+        pos_to_neg = pos_size / neg_size
+        n_pos = 1
+        n_neg = 1
+        print('Positive to Negative data ratio: ' + str(pos_data))
+        if pos_to_neg < 0.2:
+            n_pos = ceil(0.2 / pos_to_neg)
+        elif pos_to_neg > 2.0:
+            n_neg = ceil(pos_to_neg / 2.0)
+        print('Positive to Negative show ratio: ' + str(n_pos) + ' / ' + str(n_neg))
+        pos_keys = []
+        neg_keys = []
+        for i in range(n_pos):
+            pos_keys.extend(shuffle(list(pos_data.keys())))
+        for x in range(n_neg):
+            neg_keys.extend(shuffle(list(neg_data.keys())))
+        if len(pos_keys) > len(neg_keys):
+            b_size = ceil(len(pos_keys) / len(neg_keys))
+            pos_batches = np.array_split(pos_keys, b_size)
+            neg_batches = []
+            for i in neg_keys:
+                neg_batches.append([i])
+        else:
+            b_size = ceil(len(neg_keys) / len(pos_keys))
+            neg_batches = np.array_split(neg_keys, b_size)
+            pos_batches = []
+            for i in pos_keys:
+                pos_batches.append([i])
+        return pos_batches, neg_batches
+
+    def create_datadict(self, path, exclude, max_batch):
+        datadict = {}
+        data_out = {}
+        indata = json.load(path)
+        size = 0
+        for prot in indata:
+            if prot not in exclude:
+                if str(len(indata[prot])) not in datadict:
+                    datadict[str(len(indata[prot]))] = []
+                datadict[str(len(indata[prot]))].append(indata[prot])
+                size += 1
+        for length in datadict:
+            if len(datadict[length]) <= max_batch:
+                data_out[length] = datadict[length]
+            else:
+                for x in range(ceil(len(datadict[length])/max_batch)):
+                    data_out[length + '_' + str(x)] = datadict[length][max_batch * x: length[max_batch * (x + 1)]]
+        return data_out, size
 
     def predict(self, query):
-        querydata = []
+        query_data = []
         for line in query.readlines():
             if line:
-                querydata.append([int(j) for j in line.split('\t') if j != ''])
+                query_data.append([int(j) for j in line.split('\t') if j != ''])
         results = self.model.predict(
-            querydata, batch_size=50, verbose=0, steps=None, callbacks=None, max_queue_size=10,
+            query_data, batch_size=50, verbose=0, steps=None, callbacks=None, max_queue_size=10,
             workers=1, use_multiprocessing=True
         )
         return results
@@ -159,4 +213,6 @@ class DenseLayersModel:
     def load_weights(self, path):
         self.model.load_weights(path)
 
+    def save_weights(self, path):
+        self.model.save_weights(path)
 
