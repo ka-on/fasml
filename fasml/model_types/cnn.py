@@ -89,8 +89,8 @@ class CNNModel:
     def train(self, positive, negative, p_exclude, n_exclude, epochs):
         print(self.name)
         # prepare batches
-        pos_data, pos_size = self.create_datadict(positive, p_exclude, 20)
-        neg_data, neg_size = self.create_datadict(negative, n_exclude, 20)
+        pos_data, pos_size = self.create_datadict(positive, p_exclude, 20, 20)
+        neg_data, neg_size = self.create_datadict(negative, n_exclude, 20, 20)
         pos_batches, neg_batches = self.prepare_batches(pos_data, pos_size, neg_data, neg_size)
 
         # train model
