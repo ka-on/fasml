@@ -39,9 +39,7 @@ class CNNModel:
         convolution2 = tf.keras.layers.Conv1D(128, 4, activation='relu')
         convolution3 = tf.keras.layers.Conv1D(256, 4, activation='relu')
         model.add(convolution)
-        model.add(pooling)
         model.add(convolution2)
-        model.add(pooling)
         model.add(convolution3)
         model.add(pooling)
         model.add(tf.keras.layers.Flatten())
@@ -111,7 +109,7 @@ class CNNModel:
                 for minibatch in pos_batches[step]:
                     loss_value = self.train_step(minibatch, np.ones(len(minibatch)))
                 for minibatch in neg_batches[step]:
-                    loss_value = self.train_step(minibatch, np.ones(len(minibatch)))
+                    loss_value = self.train_step(minibatch, np.zeros(len(minibatch)))
 
                 # Log every 200 batches.
                 if step % 200 == 0:
