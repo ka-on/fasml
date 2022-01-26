@@ -34,7 +34,7 @@ class CNNModel:
                  optimizer=tf.keras.optimizers.SGD(),
                  loss_function=tf.losses.MeanSquaredError()):
         model = tf.keras.Sequential()
-        convolution = tf.keras.layers.Conv1D(64, 20, activation='relu', input_shape=(None, features))
+        convolution = tf.keras.layers.Conv1D(64, 50, activation='relu', input_shape=(None, features))
         pooling = tf.keras.layers.GlobalMaxPooling1D()
         convolution2 = tf.keras.layers.Conv1D(256, 4, activation='relu')
         model.add(convolution)
@@ -51,7 +51,7 @@ class CNNModel:
         model.compile(optimizer=optimizer, loss=loss_function, metrics=["accuracy"])
         self.model = model
         self.topology = {
-            'input': [features, '>=20'],
+            'input': [features, '>=50'],
             'layers': [
                 ['conv', [features, 20, 32]],
                 ['conv', [1, 4, 64]],
@@ -84,8 +84,8 @@ class CNNModel:
     def train(self, positive, negative, p_exclude, n_exclude, epochs):
         print(self.name)
         # prepare batches
-        pos_data, pos_size = self.create_datadict(positive, p_exclude, 20, 30)
-        neg_data, neg_size = self.create_datadict(negative, n_exclude, 20, 30)
+        pos_data, pos_size = self.create_datadict(positive, p_exclude, 20, 60)
+        neg_data, neg_size = self.create_datadict(negative, n_exclude, 20, 60)
         pos_batches, neg_batches = self.prepare_batches(pos_data, pos_size, neg_data, neg_size)
 
         # train model
@@ -219,7 +219,7 @@ class CNNModel:
         return datadict
 
     def predict(self, path):
-        query_data = self.create_query_datadict(path, 30)
+        query_data = self.create_query_datadict(path, 60)
         results = {}
         for batch in query_data:
             part_result = self.model.predict(np.array(batch[0]), verbose=False)
