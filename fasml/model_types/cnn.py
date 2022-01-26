@@ -108,45 +108,30 @@ class CNNModel:
             # Iterate over the batches of the dataset.
             for step in range(len(pos_batches)):
                 for minibatch in pos_batches[step]:
-                    loss_value = self.train_step(minibatch, np.ones(len(minibatch)))
+                    loss_value = self.model.train_on_batches(np.array(minibatch), np.ones(len(minibatch)))
                 for minibatch in neg_batches[step]:
-                    loss_value = self.train_step(minibatch, np.zeros(len(minibatch)))
+                    loss_value = self.model.train_on_batches(np.array(minibatch), np.zeros(len(minibatch)))
 
                 # Log every 200 batches.
                 if step % 200 == 0:
                     print(
                         "Training loss (for one batch) at step %d: %.4f"
-                        % (step, float(loss_value))
+                        % (step, float(loss_value[0]))
                     )
                     print("Seen so far: %d batches" % (step + 1))
 
-            # Display metrics at the end of each epoch.
-            train_acc = self.train_acc_metric.result()
+            evaluation = []
+            for step in range(len(pos_batches)):
+                for minibatch in pos_batches[step]:
+                    evaluation.append(self.model.evaluate(np.array(minibatch), np.ones(len(minibatch)))[1])
+                for minibatch in neg_batches[step]:
+                    evaluation.append(self.model.evaluate(np.array(minibatch), np.zeros(len(minibatch)))[1])
+
+            train_acc = sum(evaluation) / len(evaluation)
             print("Training acc over epoch: %.4f" % (float(train_acc),))
-            train_data['t_acc'].append(float(train_acc))
-
-            # Reset training metrics at the end of each epoch
-            self.train_acc_metric.reset_states()
-
-            # Run a validation loop at the end of each epoch.
-#            for x_batch_val, y_batch_val in val_dataset:
-#                test_step(x_batch_val, y_batch_val)
-
-#            val_acc = self.val_acc_metric.result()
-#            self.val_acc_metric.reset_states()
-#            print("Validation acc: %.4f" % (float(val_acc),))
             print("Time taken: %.2fs" % (time.time() - start_time))
+            train_data['t_acc': train_acc]
         return train_data
-
-    @tf.function
-    def train_step(self, x, y):
-        with tf.GradientTape() as tape:
-            logits = self.model(x, training=True)
-            loss_value = self.loss_fn(y, logits)
-        grads = tape.gradient(loss_value, self.model.trainable_weights)
-        self.optimizer.apply_gradients(zip(grads, self.model.trainable_weights))
-        self.train_acc_metric.update_state(y, logits)
-        return loss_value
 
     def prepare_batches(self, pos_data, pos_size, neg_data, neg_size):
         pos_to_neg = pos_size / neg_size
