@@ -48,6 +48,7 @@ setup(
                             "fasml.create_dense = fasml.create_dense_NN:get_args",
                             "fasml.create_cnn = fasml.create_CNN:get_args",
                             "fasml.apply_dense = fasml.apply_dense_NN:get_args",
+                            "fasml.apply_cnn = fasml.apply_CNN:get_args",
                             "fasml.input_cnn = fasml.file_handling.input_cnn:get_args"
                             ],
     },
