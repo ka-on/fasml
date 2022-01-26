@@ -151,7 +151,7 @@ class CNNModel:
         pos_to_neg = pos_size / neg_size
         n_pos = 1
         n_neg = 1
-        print('Positive to Negative data ratio: ' + str(pos_data))
+        print('Positive to Negative data ratio: ' + str(pos_to_neg))
         if pos_to_neg < 0.2:
             n_pos = ceil(0.2 / pos_to_neg)
         elif pos_to_neg > 2.0:
@@ -160,11 +160,13 @@ class CNNModel:
         pos_keys = []
         neg_keys = []
         for i in range(n_pos):
-            # noinspection PyTypeChecker
-            pos_keys.extend(shuffle(list(pos_data.keys())))
+            tmp = list(pos_data.keys())
+            shuffle(tmp)
+            pos_keys.extend(tmp)
         for x in range(n_neg):
-            # noinspection PyTypeChecker
-            neg_keys.extend(shuffle(list(neg_data.keys())))
+            tmp = list(neg_data.keys())
+            shuffle(tmp)
+            neg_keys.extend(tmp)
         if len(pos_keys) > len(neg_keys):
             b_size = ceil(len(pos_keys) / len(neg_keys))
             pos_batches = np.array_split(pos_keys, b_size)
