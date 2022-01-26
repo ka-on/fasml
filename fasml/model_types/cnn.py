@@ -89,8 +89,8 @@ class CNNModel:
     def train(self, positive, negative, p_exclude, n_exclude, epochs):
         print(self.name)
         # prepare batches
-        pos_data, pos_size = self.create_datadict(positive, p_exclude, 20, 20)
-        neg_data, neg_size = self.create_datadict(negative, n_exclude, 20, 20)
+        pos_data, pos_size = self.create_datadict(positive, p_exclude, 20, 30)
+        neg_data, neg_size = self.create_datadict(negative, n_exclude, 20, 30)
         pos_batches, neg_batches = self.prepare_batches(pos_data, pos_size, neg_data, neg_size)
 
         # train model
@@ -103,8 +103,6 @@ class CNNModel:
         for epoch in range(epochs):
             print("\nStart of epoch %d" % (epoch,))
             start_time = time.time()
-            loss_value = None
-
             # Iterate over the batches of the dataset.
             for step in range(len(pos_batches)):
                 loss_value = []
@@ -114,7 +112,7 @@ class CNNModel:
                     loss_value.append(self.model.train_on_batch(np.array(minibatch), np.zeros(len(minibatch)))[1])
 
                 # Log every 200 batches.
-                if step % 1 == 0:
+                if step % 200 == 0:
                     print(
                         "Training loss (for one batch) at step %d: %.4f"
                         % (step, float(sum(loss_value)/len(loss_value)))
@@ -124,14 +122,16 @@ class CNNModel:
             evaluation = []
             for step in range(len(pos_batches)):
                 for minibatch in pos_batches[step]:
-                    evaluation.append(self.model.evaluate(np.array(minibatch), np.ones(len(minibatch)))[1])
+                    evaluation.append(self.model.evaluate(np.array(minibatch),
+                                                          np.ones(len(minibatch)), verbose=False)[1])
                 for minibatch in neg_batches[step]:
-                    evaluation.append(self.model.evaluate(np.array(minibatch), np.zeros(len(minibatch)))[1])
+                    evaluation.append(self.model.evaluate(np.array(minibatch),
+                                                          np.zeros(len(minibatch)), verbose=False)[1])
 
             train_acc = sum(evaluation) / len(evaluation)
             print("Training acc over epoch: %.4f" % (float(train_acc),))
             print("Time taken: %.2fs" % (time.time() - start_time))
-            train_data['t_acc': train_acc]
+            train_data['t_acc'] = train_acc
         return train_data
 
     def prepare_batches(self, pos_data, pos_size, neg_data, neg_size):
@@ -162,9 +162,8 @@ class CNNModel:
         return pos_batches, neg_batches
 
     def prepare_batches_01(self, keys_01, keys_02, data_01, data_02):
-        b_size = ceil(len(keys_01) / len(keys_02))
         batches_01 = []
-        tmp = np.array_split(keys_01, b_size)
+        tmp = np.array_split(keys_01, keys_02)
         c = 0
         for i in tmp:
             tmp2 = []
