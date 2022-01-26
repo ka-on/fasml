@@ -182,7 +182,8 @@ class CNNModel:
     def create_datadict(self, path, exclude, max_batch):
         datadict = {}
         data_out = {}
-        indata = json.load(path)
+        with open(path, 'r') as infile:
+            indata = json.load(path)
         size = 0
         for prot in indata:
             if prot not in exclude:
