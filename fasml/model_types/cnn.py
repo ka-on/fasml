@@ -108,9 +108,9 @@ class CNNModel:
             # Iterate over the batches of the dataset.
             for step in range(len(pos_batches)):
                 for minibatch in pos_batches[step]:
-                    loss_value = self.model.train_on_batches(np.array(minibatch), np.ones(len(minibatch)))
+                    loss_value = self.model.train_on_batch(np.array(minibatch), np.ones(len(minibatch)))
                 for minibatch in neg_batches[step]:
-                    loss_value = self.model.train_on_batches(np.array(minibatch), np.zeros(len(minibatch)))
+                    loss_value = self.model.train_on_batch(np.array(minibatch), np.zeros(len(minibatch)))
 
                 # Log every 200 batches.
                 if step % 200 == 0:
@@ -175,18 +175,27 @@ class CNNModel:
             batches_02.append([data_02[i]])
         return batches_01, batches_02
 
-    def create_datadict(self, path, exclude, max_batch):
+    def create_datadict(self, path, exclude, max_batch, min_len):
         datadict = {}
         data_out = {}
+        empty_col = None
         with open(path, 'r') as infile:
             indata = json.load(infile)
         size = 0
         for prot in indata:
+            if not empty_col:
+                empty_col = []
+                for f in indata[prot][0]:
+                    empty_col.append(0)
             if prot not in exclude:
-                if str(len(indata[prot])) not in datadict:
-                    datadict[str(len(indata[prot]))] = []
-                datadict[str(len(indata[prot]))].append(indata[prot])
+                tmp = indata[prot]
+                while len(tmp) < min_len:
+                    tmp.append(empty_col)
+                if str(len(tmp)) not in datadict:
+                    datadict[str(len(tmp))] = []
+                datadict[str(len(tmp))].append(tmp)
                 size += 1
+
         for length in datadict:
             if len(datadict[length]) <= max_batch:
                 data_out[length] = datadict[length]
