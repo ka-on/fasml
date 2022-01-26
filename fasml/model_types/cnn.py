@@ -173,7 +173,7 @@ class CNNModel:
             tmp = np.array_split(pos_keys, b_size)
             for i in tmp:
                 tmp2 = []
-                for x in tmp[i]:
+                for x in i:
                     tmp2.append(x)
                 tmp.append(tmp2)
             neg_batches = []
@@ -185,7 +185,7 @@ class CNNModel:
             tmp = np.array_split(neg_keys, b_size)
             for i in tmp:
                 tmp2 = []
-                for x in tmp[i]:
+                for x in i:
                     tmp2.append(x)
                 tmp.append(tmp2)
             neg_batches = []
