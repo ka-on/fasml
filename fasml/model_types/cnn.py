@@ -222,6 +222,7 @@ class CNNModel:
         query_data = self.create_query_datadict(path, 60)
         results = {}
         for batch in query_data:
+            print(np.array(batch))
             part_result = self.model.predict(np.array(batch[0]), verbose=False)
             for i in range(len(batch[0])):
                 results[batch[1][i]] = part_result[i][0]
