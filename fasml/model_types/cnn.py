@@ -36,11 +36,9 @@ class CNNModel:
         model = tf.keras.Sequential()
         convolution = tf.keras.layers.Conv1D(64, 20, activation='relu', input_shape=(None, features))
         pooling = tf.keras.layers.GlobalMaxPooling1D()
-        convolution2 = tf.keras.layers.Conv1D(128, 4, activation='relu')
-        convolution3 = tf.keras.layers.Conv1D(256, 4, activation='relu')
+        convolution2 = tf.keras.layers.Conv1D(256, 4, activation='relu')
         model.add(convolution)
         model.add(convolution2)
-        model.add(convolution3)
         model.add(pooling)
         model.add(tf.keras.layers.Flatten())
         for units in [128, 64, 32, 16, 8, 4, 2, 1]:
@@ -56,11 +54,8 @@ class CNNModel:
             'input': [features, '>=20'],
             'layers': [
                 ['conv', [features, 20, 32]],
-                ['maxPool', [32]],
                 ['conv', [1, 4, 64]],
-                ['maxPool', [64]],
-                ['conv', [1, 4, 128]],
-                ['maxPool', [128]],
+                ['maxPool', [256]],
                 ['dense', [128]],
                 ['dense', [64]],
                 ['dense', [32]],
