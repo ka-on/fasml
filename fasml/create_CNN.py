@@ -27,13 +27,13 @@ import argparse
 from fasml.model_types import cnn
 
 
-def main(pos_path, neg_path, name, features, outpath, epochv, p_exclude, n_exclude):
+def main(pos_path, neg_path, name, features, outpath, epochs, p_exclude, n_exclude, acc_threshold):
     model = cnn.CNNModel(name, features)
     topology = model.get_topology()
     outpath2 = os.path.join(outpath, name)
     if not os.path.isdir(outpath2):
         os.mkdir(outpath2)
-    model.train(pos_path, neg_path, p_exclude, n_exclude, epochv)
+    model.train(pos_path, neg_path, p_exclude, n_exclude, epochs, acc_threshold)
     topology['name'] = name
     model.save_weights(outpath2 + '/' + name)
     with open(os.path.join(outpath2 + '/topology.json'), 'w') as out:
@@ -52,8 +52,10 @@ def get_args():
                           help="path to directory where network data is saved")
     required.add_argument("-g", "--name", type=str, required=True,
                           help="name of the model")
-    required.add_argument("-e", "--epochs", type=int, required=True,
-                          help="number of epochs")
+    optional.add_argument("-e", "--epochs", type=int, default=5,
+                          help="maximum number of training epochs")
+    optional.add_argument("-a", "--target_accuracy", type=float, default=0.9,
+                          help="training will stop when reaching this threshold")
     optional.add_argument("--p_exclude", default=(), nargs='*', type=str,
                           help="Choose specific proteins (ids divided by spaces) that will be removed from the "
                                "positive training set")
@@ -65,7 +67,7 @@ def get_args():
     args = parser.parse_args()
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = "2"
     main(args.posPath, args.negPath, args.name, args.features, args.outPath,
-         args.epochs, args.p_exclude, args.n_exclude)
+         args.epochs, args.p_exclude, args.n_exclude, args.target_accuracy)
 
 
 if __name__ == '__main__':

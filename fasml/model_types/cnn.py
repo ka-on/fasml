@@ -53,7 +53,7 @@ class CNNModel:
         self.topology = {
             'input': [features, '>=50'],
             'layers': [
-                ['conv', [features, 20, 32]],
+                ['conv', [features, 50, 32]],
                 ['conv', [1, 4, 64]],
                 ['maxPool', [256]],
                 ['dense', [128]],
@@ -81,7 +81,7 @@ class CNNModel:
             show_layer_names=False, rankdir='LR'
         )
 
-    def train(self, positive, negative, p_exclude, n_exclude, epochs):
+    def train(self, positive, negative, p_exclude, n_exclude, epochs, acc_threshold):
         print(self.name)
         # prepare batches
         pos_data, pos_size = self.create_datadict(positive, p_exclude, 20, 60)
@@ -90,12 +90,14 @@ class CNNModel:
 
         # train model
         print('# Training Model')
-        train_info = self.train_on_batches(pos_batches, neg_batches, epochs)
+        train_info = self.train_on_batches(pos_batches, neg_batches, epochs, acc_threshold)
         return train_info
 
-    def train_on_batches(self, pos_batches, neg_batches, epochs):
+    def train_on_batches(self, pos_batches, neg_batches, epochs, acc_threshold):
         train_data = {'t_acc': []}
-        for epoch in range(epochs):
+        train_acc = 0.0
+        epoch = 1
+        while epoch <= epochs and train_acc < acc_threshold:
             print("\nStart of epoch %d" % (epoch,))
             start_time = time.time()
             # Iterate over the batches of the dataset.
@@ -127,6 +129,7 @@ class CNNModel:
             print("Training acc over epoch: %.4f" % (float(train_acc),))
             print("Time taken: %.2fs" % (time.time() - start_time))
             train_data['t_acc'] = train_acc
+            epoch += 1
         return train_data
 
     def prepare_batches(self, pos_data, pos_size, neg_data, neg_size):
