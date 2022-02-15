@@ -33,11 +33,14 @@ def main(pos_path, neg_path, name, features, outpath, epochs, p_exclude, n_exclu
     outpath2 = os.path.join(outpath, name)
     if not os.path.isdir(outpath2):
         os.mkdir(outpath2)
-    model.train(pos_path, neg_path, p_exclude, n_exclude, epochs, acc_threshold)
+    train_data = model.train(pos_path, neg_path, p_exclude, n_exclude, epochs, acc_threshold)
     topology['name'] = name
     model.save_weights(outpath2 + '/' + name)
     with open(os.path.join(outpath2 + '/topology.json'), 'w') as out:
         json.dump(topology, out)
+    with open(os.path.join(outpath2 + '/statistics.tsv'), 'w') as out:
+        out.write('positive data:\t' + str(train_data['p_size']) + '\nnegative data:\t' + str(train_data['n_size'])
+                  + '\nration[p/n]:\t' + train_data['ratio'] + '\ntraining accuracy:\t' + str(train_data['t_acc']))
 
 
 def get_args():

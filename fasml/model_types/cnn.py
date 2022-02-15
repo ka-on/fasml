@@ -86,11 +86,13 @@ class CNNModel:
         # prepare batches
         pos_data, pos_size = self.create_datadict(positive, p_exclude, 20, 60)
         neg_data, neg_size = self.create_datadict(negative, n_exclude, 20, 60)
-        pos_batches, neg_batches = self.prepare_batches(pos_data, pos_size, neg_data, neg_size)
+        pos_batches, neg_batches, n_pos, n_neg = self.prepare_batches(pos_data, pos_size, neg_data, neg_size)
 
         # train model
         print('# Training Model')
         train_info = self.train_on_batches(pos_batches, neg_batches, epochs, acc_threshold)
+        train_info['p_size'], train_info['n_size'] = pos_size, neg_size
+        train_info['ratio'] = str(n_pos) + '/' + str(n_neg)
         return train_info
 
     def train_on_batches(self, pos_batches, neg_batches, epochs, acc_threshold):
@@ -157,7 +159,7 @@ class CNNModel:
             pos_batches, neg_batches = self.prepare_batches_01(pos_keys, neg_keys, pos_data, neg_data)
         else:
             neg_batches, pos_batches = self.prepare_batches_01(neg_keys, pos_keys, neg_data, pos_data)
-        return pos_batches, neg_batches
+        return pos_batches, neg_batches, n_pos, n_neg
 
     def prepare_batches_01(self, keys_01, keys_02, data_01, data_02):
         batches_01 = []
