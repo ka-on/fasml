@@ -119,15 +119,21 @@ class CNNModel:
                     print("Seen so far: %d batches" % (step + 1))
 
             evaluation = []
+            size = []
             for step in range(len(pos_batches)):
                 for minibatch in pos_batches[step]:
                     evaluation.append(self.model.evaluate(np.array(minibatch),
                                                           np.ones(len(minibatch)), verbose=False)[1])
+                    size.append(len(minibatch))
                 for minibatch in neg_batches[step]:
                     evaluation.append(self.model.evaluate(np.array(minibatch),
                                                           np.zeros(len(minibatch)), verbose=False)[1])
+                    size.append(len(minibatch))
 
-            train_acc = sum(evaluation) / len(evaluation)
+            tmp = 0.0
+            for i in range(len(evaluation)):
+                tmp += evaluation[i] * size[i]
+            train_acc = tmp / sum(size)
             print("Training acc over epoch: %.4f" % (float(train_acc),))
             print("Time taken: %.2fs" % (time.time() - start_time))
             train_data['t_acc'] = train_acc

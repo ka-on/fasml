@@ -43,7 +43,7 @@ def get_args():
     parser = argparse.ArgumentParser(epilog="apply CNN")
     required = parser.add_argument_group('required arguments')
     required.add_argument("-i", "--inPath", default='.', type=str, required=True,
-                          help="path to query.csv")
+                          help="path to query.json")
     required.add_argument("-o", "--outPath", default='.', type=str, required=True,
                           help="path to output file")
     required.add_argument("-n", "--network", type=str, required=True,

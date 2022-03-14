@@ -57,7 +57,7 @@ def get_args():
                           help="name of the model")
     optional.add_argument("-e", "--epochs", type=int, default=5,
                           help="maximum number of training epochs")
-    optional.add_argument("-a", "--target_accuracy", type=float, default=0.9,
+    optional.add_argument("-a", "--target_accuracy", type=float, default=0.95,
                           help="training will stop when reaching this threshold")
     optional.add_argument("--p_exclude", default=(), nargs='*', type=str,
                           help="Choose specific proteins (ids divided by spaces) that will be removed from the "
