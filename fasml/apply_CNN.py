@@ -24,6 +24,7 @@
 import os
 import json
 import argparse
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = "2"
 from fasml.model_types import cnn
 
 
@@ -49,7 +50,6 @@ def get_args():
     required.add_argument("-n", "--network", type=str, required=True,
                           help="path to folder with network data")
     args = parser.parse_args()
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = "2"
     main(args.inPath, args.outPath, args.network)
 
 

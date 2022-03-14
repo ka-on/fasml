@@ -24,7 +24,9 @@
 import os
 import json
 import argparse
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = "2"
 from fasml.model_types import cnn
+
 
 
 def main(pos_path, neg_path, name, features, outpath, epochs, p_exclude, n_exclude, acc_threshold):
@@ -68,7 +70,6 @@ def get_args():
     optional.add_argument("-f", "--features", default=9, type=int,
                           help="Number of features (dimensionality of input)")
     args = parser.parse_args()
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = "2"
     main(args.posPath, args.negPath, args.name, args.features, args.outPath,
          args.epochs, args.p_exclude, args.n_exclude, args.target_accuracy)
 

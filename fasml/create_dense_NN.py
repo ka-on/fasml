@@ -24,6 +24,7 @@
 import os
 import json
 import argparse
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = "2"
 from fasml.model_types import dense
 
 
@@ -62,7 +63,6 @@ def get_args():
                           help="name of the group, filename [NAME.structure]")
     required.add_argument("-e", "--epochs", type=int, required=True)
     args = parser.parse_args()
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = "2"
     main(args.group, args.inpath, args.outPath, args.epochs)
 
 
